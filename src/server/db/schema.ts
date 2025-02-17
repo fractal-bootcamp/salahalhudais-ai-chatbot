@@ -12,19 +12,36 @@ import { index, int, sqliteTableCreator, text } from "drizzle-orm/sqlite-core";
  */
 export const createTable = sqliteTableCreator((name) => `chatbot_${name}`);
 
-export const posts = createTable(
-  "post",
+export const sessions = createTable(
+  "session",
   {
-    id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-    name: text("name", { length: 256 }),
+    id: text("id").primaryKey(),
     createdAt: int("created_at", { mode: "timestamp" })
       .default(sql`(unixepoch())`)
       .notNull(),
     updatedAt: int("updated_at", { mode: "timestamp" }).$onUpdate(
       () => new Date()
     ),
+  }
+);
+<<<<<<< Updated upstream
+=======
+
+export const messages = createTable(
+  "message",
+  {
+    id: text("id").primaryKey(),
+    sessionId: text("session_id")
+      .notNull()
+      .references(() => sessions.id),
+    content: text("content").notNull(),
+    role: text("role", { enum: ["user", "assistant"] }).notNull(),
+    createdAt: int("created_at", { mode: "timestamp" })
+      .default(sql`(unixepoch())`)
+      .notNull(),
   },
-  (example) => ({
-    nameIndex: index("name_idx").on(example.name),
+  (message) => ({
+    sessionIdx: index("session_idx").on(message.sessionId),
   })
 );
+>>>>>>> Stashed changes
