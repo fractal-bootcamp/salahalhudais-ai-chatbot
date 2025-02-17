@@ -9,4 +9,5 @@ export default {
     url: env.DATABASE_URL,
   },
   tablesFilter: ["chatbot_*"],
+  foreignKeys: true,
 } satisfies Config;

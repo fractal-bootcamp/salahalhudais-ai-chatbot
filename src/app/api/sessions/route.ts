@@ -9,3 +9,11 @@ export async function POST() {
 
   return NextResponse.json(session[0]);
 }
+
+export async function GET() {
+  const sessions = await db.query.sessions.findMany({
+    orderBy: (sessions) => [sessions.createdAt],
+  });
+  
+  return NextResponse.json(sessions);
+}

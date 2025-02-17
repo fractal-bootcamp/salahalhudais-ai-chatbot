@@ -24,8 +24,6 @@ export const sessions = createTable(
     ),
   }
 );
-<<<<<<< Updated upstream
-=======
 
 export const messages = createTable(
   "message",
@@ -44,6 +42,3 @@ export const messages = createTable(
     sessionIdx: index("session_idx").on(message.sessionId),
   })
 );
->>>>>>> Stashed changes
-
-export const 

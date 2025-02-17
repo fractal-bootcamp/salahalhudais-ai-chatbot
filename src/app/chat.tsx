@@ -1,10 +1,52 @@
-'use client'
+'use client';
 import { useChat } from '@ai-sdk/react';
+import { useEffect, useState } from 'react';
 
 export default function Chat() {
-  const { messages, error, input, status, handleInputChange, handleSubmit } = useChat({
-    api: '/api/chat'
-  })
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [messages, setMessages] = useState([]);
+
+  const { input, handleInputChange, handleSubmit } = useChat({
+    api: '/api/chat',
+    body: { sessionId },
+    onFinish: async (message) => {
+      await fetch('/api/messages', {
+        method: 'POST',
+        body: JSON.stringify({
+          sessionId,
+          content: message.content,
+          role: 'assistant'
+        })
+      });
+    }
+  });
+
+  useEffect(() => {
+    fetch('/api/sessions', { method: 'POST' })
+      .then(res => res.json())
+      .then(data => {
+        setSessionId(data.id);
+        return fetch(`/api/messages?sessionId=${data.id}`);
+      })
+      .then(res => res.json())
+      .then(messages => {
+        setMessages(messages);
+      });
+  }, []);
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await fetch('/api/messages', {
+      method: 'POST',
+      body: JSON.stringify({
+        sessionId,
+        content: input,
+        role: 'user'
+      })
+    });
+
+    handleSubmit(e);
+  };
 
   return (
     <div>
@@ -16,14 +58,10 @@ export default function Chat() {
           </li>
         ))}
       </ul>
-
-      <form onSubmit={handleSubmit}>
-        <label>
-          Say something...
-          <input value={input} onChange={handleInputChange} />
-        </label>
+      <form onSubmit={onSubmit}>
+        <input value={input} onChange={handleInputChange} />
         <button type="submit">Send</button>
       </form>
     </div>
-  )
+  );
 }
