@@ -2,6 +2,7 @@
 
 import { Message, useChat } from '@ai-sdk/react';
 import { useRef, useState } from 'react';
+import ModelSelector from './modelSelector';
 
 type ChatProps = {
   chatId: number;
@@ -9,9 +10,13 @@ type ChatProps = {
 };
 
 export default function Chat({ chatId, initialMessages }: ChatProps) {
+  const [selectedModel, setSelectedModel] = useState('gpt-4o-mini');
   const { messages, input, handleSubmit, handleInputChange, status, error } = useChat({
-    id: chatId.toString(), // the sessionId for the chat
+    id: chatId.toString(),
     initialMessages,
+    body: {
+      model: selectedModel,
+    },
   });
   console.log(status, error)
 
@@ -20,6 +25,14 @@ export default function Chat({ chatId, initialMessages }: ChatProps) {
 
   return (
     <div className="flex h-screen flex-col bg-white">
+      {/* Model Selector */}
+      <div className="border-b border-gray-200 p-4">
+        <ModelSelector 
+          selectedModel={selectedModel} 
+          onModelChange={setSelectedModel} 
+        />
+      </div>
+
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message, index) => (

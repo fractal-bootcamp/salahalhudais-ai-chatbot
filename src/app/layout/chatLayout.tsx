@@ -1,5 +1,5 @@
 import SessionList from '../_components/sessionList';
-import { getSessionIds } from '~/tools/chat-store';
+import { getSessionsInfo } from '~/tools/chat-store';
 import Link from 'next/link';
 
 export default async function ChatLayout({
@@ -7,7 +7,7 @@ export default async function ChatLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const sessionIds = await getSessionIds();
+  const sessions = await getSessionsInfo();
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -19,7 +19,7 @@ export default async function ChatLayout({
         >
           <span className="mr-2">+</span> New Chat
         </Link>
-        <SessionList sessionIds={sessionIds} />
+        <SessionList sessions={sessions} />
       </div>
 
       {/* Main Chat Area */}

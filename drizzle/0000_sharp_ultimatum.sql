@@ -10,5 +10,6 @@ CREATE TABLE `chatbotrerun_message` (
 --> statement-breakpoint
 CREATE TABLE `chatbotrerun_session` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`title` text DEFAULT 'New Chat',
 	`created_at` integer DEFAULT (unixepoch()) NOT NULL
 );

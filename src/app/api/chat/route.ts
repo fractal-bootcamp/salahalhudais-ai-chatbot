@@ -3,10 +3,10 @@ import { appendResponseMessages, streamText } from 'ai';
 import { saveChat } from '~/tools/chat-store';
 
 export async function POST(req: Request) {
-  const { messages, id } = await req.json();
+  const { messages, id, model } = await req.json();
 
   const result = streamText({
-    model: openai('gpt-4o-mini'),
+    model: openai(model),
     messages,
     onError({error}) {
       console.error(error)

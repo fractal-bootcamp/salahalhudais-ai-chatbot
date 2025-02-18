@@ -16,6 +16,7 @@ export const sessions = createTable(
   "session",
   {
     id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+    title: text("title").default("New Chat"),
     createdAt: int("created_at", { mode: "timestamp" })
       .default(sql`(unixepoch())`)
       .notNull(),

@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "e15c0e31-b527-4567-bb14-bae66b2e193c",
+  "id": "2b9a348c-2eb2-4405-a079-1e817b1ed08f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "chatbotrerun_message": {
@@ -79,6 +79,14 @@
           "primaryKey": true,
           "notNull": true,
           "autoincrement": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'New Chat'"
         },
         "created_at": {
           "name": "created_at",
