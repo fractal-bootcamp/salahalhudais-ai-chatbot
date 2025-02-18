@@ -1,0 +1,45 @@
+[
+  {
+    "role": "user",
+    "content": "Hey What's up!",
+    "parts": [
+      {
+        "type": "text",
+        "text": "Hey What's up!"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": "Hello! I'm here and ready to help you with anything you need. What's on your mind?",
+    "parts": [
+      {
+        "type": "text",
+        "text": "Hello! I'm here and ready to help you with anything you need. What's on your mind?"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": "What's going on with you!",
+    "parts": [
+      {
+        "type": "text",
+        "text": "What's going on with you!"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "id": "msg-KPwIvhKmXGIOtPuIX4mQrNuO",
+    "createdAt": "2025-02-18T17:31:05.973Z",
+    "content": "I'm just here, ready to assist you with any questions or topics you'd like to discuss! How about you? What's going on with you?",
+    "toolInvocations": [],
+    "parts": [
+      {
+        "type": "text",
+        "text": "I'm just here, ready to assist you with any questions or topics you'd like to discuss! How about you? What's going on with you?"
+      }
+    ]
+  }
+]

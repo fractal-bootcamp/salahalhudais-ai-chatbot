@@ -1,0 +1,45 @@
+[
+  {
+    "role": "user",
+    "content": "Hey whats up!",
+    "parts": [
+      {
+        "type": "text",
+        "text": "Hey whats up!"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": "Hello! I'm here and ready to help you with anything you need. What’s on your mind?",
+    "parts": [
+      {
+        "type": "text",
+        "text": "Hello! I'm here and ready to help you with anything you need. What’s on your mind?"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": "Why is the sky blue?",
+    "parts": [
+      {
+        "type": "text",
+        "text": "Why is the sky blue?"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "id": "msg-3c6U9HOdKb4xzc24KNcJihWD",
+    "createdAt": "2025-02-18T17:37:08.531Z",
+    "content": "The sky appears blue due to a phenomenon called Rayleigh scattering. When sunlight enters the Earth's atmosphere, it is made up of different colors, each with varying wavelengths. Blue light has a shorter wavelength and is scattered in all directions by the gases and particles in the atmosphere. \n\nDuring the day, when the sun is high in the sky, this scattering causes the blue light to be more prominent, making the sky look blue to our eyes. In contrast, colors with longer wavelengths, like red and yellow, are scattered less and are more likely to be seen during sunrise and sunset, which is why the sky can appear red or orange at those times.",
+    "toolInvocations": [],
+    "parts": [
+      {
+        "type": "text",
+        "text": "The sky appears blue due to a phenomenon called Rayleigh scattering. When sunlight enters the Earth's atmosphere, it is made up of different colors, each with varying wavelengths. Blue light has a shorter wavelength and is scattered in all directions by the gases and particles in the atmosphere. \n\nDuring the day, when the sun is high in the sky, this scattering causes the blue light to be more prominent, making the sky look blue to our eyes. In contrast, colors with longer wavelengths, like red and yellow, are scattered less and are more likely to be seen during sunrise and sunset, which is why the sky can appear red or orange at those times."
+      }
+    ]
+  }
+]

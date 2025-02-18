@@ -1,0 +1,45 @@
+[
+  {
+    "role": "user",
+    "content": "dqwsda",
+    "parts": [
+      {
+        "type": "text",
+        "text": "dqwsda"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": "It seems like your message might have been a typo or an error. How can I assist you today?",
+    "parts": [
+      {
+        "type": "text",
+        "text": "It seems like your message might have been a typo or an error. How can I assist you today?"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": "fdsc",
+    "parts": [
+      {
+        "type": "text",
+        "text": "fdsc"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "id": "msg-JrJzbDdhLfYP45T2uWti4g9K",
+    "createdAt": "2025-02-18T17:31:33.178Z",
+    "content": "It looks like you might be typing randomly. If you have a specific question or topic you'd like to discuss, feel free to share! I'm here to help.",
+    "toolInvocations": [],
+    "parts": [
+      {
+        "type": "text",
+        "text": "It looks like you might be typing randomly. If you have a specific question or topic you'd like to discuss, feel free to share! I'm here to help."
+      }
+    ]
+  }
+]

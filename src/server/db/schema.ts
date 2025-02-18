@@ -12,19 +12,28 @@ import { index, int, sqliteTableCreator, text } from "drizzle-orm/sqlite-core";
  */
 export const createTable = sqliteTableCreator((name) => `chatbotrerun_${name}`);
 
-export const posts = createTable(
-  "post",
+export const sessions = createTable(
+  "session",
   {
     id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-    name: text("name", { length: 256 }),
+    sessionId: text("session_id").notNull().unique(),
+    createdAt: int("created_at", { mode: "timestamp" })
+      .default(sql`(unixepoch())`)
+      .notNull(),
+  },
+);
+
+export const messages = createTable(
+  "message",
+  {
+    id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+    sessionId: int("session_id").references(() => sessions.id).notNull(),
     createdAt: int("created_at", { mode: "timestamp" })
       .default(sql`(unixepoch())`)
       .notNull(),
     updatedAt: int("updated_at", { mode: "timestamp" }).$onUpdate(
       () => new Date()
     ),
+    message: text('content').notNull(),
   },
-  (example) => ({
-    nameIndex: index("name_idx").on(example.name),
-  })
 );
