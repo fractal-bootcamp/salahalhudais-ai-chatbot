@@ -4,6 +4,7 @@ CREATE TABLE `chatbotrerun_message` (
 	`created_at` integer DEFAULT (unixepoch()) NOT NULL,
 	`updated_at` integer,
 	`content` text NOT NULL,
+	`role` text NOT NULL,
 	FOREIGN KEY (`session_id`) REFERENCES `chatbotrerun_session`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint

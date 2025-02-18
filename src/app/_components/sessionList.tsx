@@ -2,16 +2,13 @@
 
 import Link from 'next/link';
 
-export default function SessionList({sessionIds}: {sessionIds: number[]}) {
-
+export default function SessionList({ sessionIds }: { sessionIds: number[] }) {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-100">
-      <h2 className="px-4 py-3 text-sm font-medium text-gray-700 border-b border-gray-100">
-        Chat History
-      </h2>
-      <ul className="divide-y divide-gray-100">
+    <div className="overflow-y-auto">
+      <h2 className="mb-2 px-2 text-xs font-semibold text-gray-500">Chat History</h2>
+      <ul className="space-y-1">
         {sessionIds.length === 0 ? (
-          <li className="px-4 py-3 text-sm text-gray-500 italic">
+          <li className="px-2 py-1 text-sm text-gray-500 italic">
             No chats yet
           </li>
         ) : (
@@ -19,10 +16,10 @@ export default function SessionList({sessionIds}: {sessionIds: number[]}) {
             <li key={id}>
               <Link
                 href={`/chat/${id}`}
-                className="px-4 py-3 flex items-center text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                className="flex items-center rounded-lg px-2 py-2 text-sm text-gray-700 hover:bg-gray-200"
               >
                 <span className="mr-2">💬</span>
-                Chat {id}...
+                Chat {id}
               </Link>
             </li>
           ))

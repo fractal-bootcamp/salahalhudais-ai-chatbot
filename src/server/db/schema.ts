@@ -34,6 +34,6 @@ export const messages = createTable(
       () => new Date()
     ),
     message: text('content').notNull(),
-    role: text('')
+    role: text("role", { enum: ["user", "assistant"] }).notNull(),
   },
 );

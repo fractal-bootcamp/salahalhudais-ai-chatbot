@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "bf5b8dac-c60b-488c-90c7-37a55e48a95b",
+  "id": "e15c0e31-b527-4567-bb14-bae66b2e193c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "chatbotrerun_message": {
@@ -38,6 +38,13 @@
         },
         "content": {
           "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "role": {
+          "name": "role",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
