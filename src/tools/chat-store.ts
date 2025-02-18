@@ -4,51 +4,68 @@ import { writeFile } from 'fs/promises';
 import path from 'path';
 import { Message } from 'ai';
 import { readFile } from 'fs/promises';
-
-// In-memory storage for chats
-export const chats: { id: string; messages: Message[] }[] = [];
+import { db } from '~/server/db';
+import { sessions, messages } from "~/server/db/schema";
+import { eq } from "drizzle-orm";
 
 export async function saveChat({
   id,
-  messages,
+  messages: chatMessages,
 }: {
   id: string;
   messages: Message[];
 }): Promise<void> {
-  const chatIndex = chats.findIndex(chat => chat.id === id);
-  if (chatIndex !== -1) {
-    const chat = chats[chatIndex];
-    if (chat) {
-      chat.messages = messages;
-    }
-  } else {
-    chats.push({ id, messages });
-  }
+  await db
+    .insert(sessions)
+    .values({
+      sessionId: id,
+    })
+    .onConflictDoNothing();
 
-  const content = JSON.stringify(messages, null, 2);
-  await writeFile(getChatFile(id), content);
+  // Insert all messages
+  if (chatMessages.length > 0) {
+    await db.insert(messages).values(
+      chatMessages.map((msg) => ({
+        sessionId: id,
+        message: msg.content,
+      }))
+    );
+  }
 }
 
 export async function loadChat(id: string): Promise<Message[]> {
-  const chat = chats.find(chat => chat.id === id);
-  if (chat) {
-    return chat.messages;
-  }
-  return JSON.parse(await readFile(getChatFile(id), 'utf8'));
+  const result = await db
+    .select()
+    .from(messages)
+    .where(eq(messages.sessionId, id))
+    .orderBy(messages.createdAt);
+
+  return result.map((msg) => ({
+    id: msg.id.toString(),
+    content: msg.message,
+    role: 'user', // You might want to add a role column
+  }));
 }
 
 export async function createChat(): Promise<string> {
-  const id = generateId(); // generate a unique chat ID
-  await writeFile(getChatFile(id), '[]'); // create an empty chat file
+  const id = generateId();
+  await db.insert(sessions).values({
+    sessionId: id,
+  });
   return id;
 }
 
-function getChatFile(id: string): string {
-  const chatDir = path.join(process.cwd(), '.chats');
-  if (!existsSync(chatDir)) mkdirSync(chatDir, { recursive: true });
-  return path.join(chatDir, `${id}.json`);
-}
-
-export function getSessionIds() {
-  return chats.map(chat => chat.id)
+export async function getSessionIds(): Promise<string[]> {
+  try {
+    const allSessions = await db.select({
+      sessionId: sessions.sessionId,
+    })
+    .from(sessions)
+    .orderBy(sessions.createdAt);
+    
+    return allSessions.map(session => session.sessionId);
+  } catch (error) {
+    console.error('Error fetching session IDs:', error);
+    return [];
+  }
 }

@@ -5,23 +5,37 @@ import { useEffect, useState } from 'react';
 
 export default function SessionList() {
   const [sessionIds, setSessionIds] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSessionIds = async () => {
       try {
+        setIsLoading(true);
         const response = await fetch('/api/sessions');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const ids = await response.json();
-        setSessionIds(ids);
+        const data = await response.json();
+        setSessionIds(data.sessions);
       } catch (error) {
         console.error('Failed to fetch session IDs:', error);
+        setError('Failed to load chat sessions');
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchSessionIds();
   }, []);
+
+  if (isLoading) {
+    return <div className="p-4 text-gray-500">Loading sessions...</div>;
+  }
+
+  if (error) {
+    return <div className="p-4 text-red-500">{error}</div>;
+  }
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100">
@@ -36,7 +50,7 @@ export default function SessionList() {
         ) : (
           sessionIds.map(id => (
             <li key={id}>
-              <Link 
+              <Link
                 href={`/chat/${id}`}
                 className="px-4 py-3 flex items-center text-sm text-gray-700 hover:bg-gray-50 transition-colors"
               >

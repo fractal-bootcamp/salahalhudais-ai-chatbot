@@ -27,7 +27,7 @@ export const messages = createTable(
   "message",
   {
     id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-    sessionId: int("session_id").references(() => sessions.id).notNull(),
+    sessionId: text("session_id").notNull(),
     createdAt: int("created_at", { mode: "timestamp" })
       .default(sql`(unixepoch())`)
       .notNull(),
