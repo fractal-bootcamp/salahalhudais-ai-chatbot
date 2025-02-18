@@ -1,14 +1,16 @@
 import Link from 'next/link';
 import SessionList from './_components/sessionList';
+import { getSessionIds } from '~/tools/chat-store';
 
-export default function Page() {
+export default async function Page() {
+  const sessionIds = await getSessionIds()
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-semibold text-gray-800 mb-8">AI Chat</h1>
         <div className="flex gap-8">
           <div className="w-64">
-            <SessionList />
+            <SessionList sessionIds={sessionIds} />
           </div>
           <div className="flex-1 bg-white rounded-lg p-8 shadow-sm border border-gray-100">
             <Link 

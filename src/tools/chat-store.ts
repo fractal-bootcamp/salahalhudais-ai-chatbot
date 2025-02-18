@@ -5,40 +5,40 @@ import path from 'path';
 import { Message } from 'ai';
 import { readFile } from 'fs/promises';
 import { db } from '~/server/db';
-import { sessions, messages } from "~/server/db/schema";
+import { sessions, messages as dbMessages } from "~/server/db/schema";
 import { eq } from "drizzle-orm";
 
-export async function saveChat({
-  id,
-  messages: chatMessages,
-}: {
-  id: string;
+type SaveChatParams = {
+  sessionId: number;
   messages: Message[];
-}): Promise<void> {
-  await db
-    .insert(sessions)
-    .values({
-      sessionId: id,
-    })
-    .onConflictDoNothing();
+}
+
+export async function saveChat({
+  sessionId,
+  messages,
+}: SaveChatParams): Promise<void> {
+  console.log("Saving Messages", sessionId, messages)
 
   // Insert all messages
-  if (chatMessages.length > 0) {
-    await db.insert(messages).values(
-      chatMessages.map((msg) => ({
-        sessionId: id,
+  if (messages.length > 0) {
+    await db.insert(dbMessages).values(
+      messages.map((msg) => ({
+        sessionId,
         message: msg.content,
       }))
-    );
+    ).onConflictDoNothing();
   }
 }
 
-export async function loadChat(id: string): Promise<Message[]> {
+export async function loadChat(id: number): Promise<Message[]> {
+  console.log("loading chat! ", id)
   const result = await db
     .select()
-    .from(messages)
-    .where(eq(messages.sessionId, id))
-    .orderBy(messages.createdAt);
+    .from(dbMessages)
+    .where(eq(dbMessages.sessionId, id))
+    .orderBy(dbMessages.createdAt);
+
+    console.log("got chats: ", result)
 
   return result.map((msg) => ({
     id: msg.id.toString(),
@@ -47,23 +47,20 @@ export async function loadChat(id: string): Promise<Message[]> {
   }));
 }
 
-export async function createChat(): Promise<string> {
-  const id = generateId();
-  await db.insert(sessions).values({
-    sessionId: id,
-  });
-  return id;
+export async function createChat(): Promise<number | undefined> {
+  console.log("creating chat")
+  const result = await db.insert(sessions).values({}).returning({sessionId: sessions.id})
+  console.log(result)
+  return result[0]?.sessionId
 }
 
-export async function getSessionIds(): Promise<string[]> {
+export async function getSessionIds(): Promise<number[]> {
   try {
-    const allSessions = await db.select({
-      sessionId: sessions.sessionId,
-    })
+    const allSessions = await db.select({id: sessions.id})
     .from(sessions)
     .orderBy(sessions.createdAt);
     
-    return allSessions.map(session => session.sessionId);
+    return allSessions.map(session => session.id);
   } catch (error) {
     console.error('Error fetching session IDs:', error);
     return [];

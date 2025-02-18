@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1739900824096,
-      "tag": "0000_perpetual_pandemic",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1739901837034,
-      "tag": "0001_abnormal_tiger_shark",
+      "when": 1739906370447,
+      "tag": "0000_sudden_alice",
       "breakpoints": true
     }
   ]

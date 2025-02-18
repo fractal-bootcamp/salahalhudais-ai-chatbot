@@ -4,15 +4,16 @@ import { Message, useChat } from '@ai-sdk/react';
 import { useRef, useState } from 'react';
 
 type ChatProps = {
-  chatId: string;
+  chatId: number;
   initialMessages: Message[];
 };
 
 export default function Chat({ chatId, initialMessages }: ChatProps) {
-  const { messages, input, handleSubmit, handleInputChange, status } = useChat({
-    id: chatId,
+  const { messages, input, handleSubmit, handleInputChange, status, error } = useChat({
+    id: chatId.toString(), // the sessionId for the chat
     initialMessages,
   });
+  console.log(status, error)
 
   const [files, setFiles] = useState<FileList | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);

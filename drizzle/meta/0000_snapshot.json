@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "c70a04ce-ccfc-4e45-bb84-fa1222c8511c",
+  "id": "bf5b8dac-c60b-488c-90c7-37a55e48a95b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "chatbotrerun_message": {
@@ -18,7 +18,7 @@
           "name": "session_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "created_at": {
@@ -73,13 +73,6 @@
           "notNull": true,
           "autoincrement": true
         },
-        "session_id": {
-          "name": "session_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "created_at": {
           "name": "created_at",
           "type": "integer",
@@ -89,15 +82,7 @@
           "default": "(unixepoch())"
         }
       },
-      "indexes": {
-        "chatbotrerun_session_session_id_unique": {
-          "name": "chatbotrerun_session_session_id_unique",
-          "columns": [
-            "session_id"
-          ],
-          "isUnique": true
-        }
-      },
+      "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
