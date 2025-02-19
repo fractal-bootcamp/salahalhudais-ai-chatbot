@@ -4,6 +4,10 @@ import { appendClientMessage, appendResponseMessages, streamText } from 'ai';
 import { saveChat, generateSessionTitle, updateSessionTitle } from '~/tools/chat-store';
 import { loadChat } from '~/tools/chat-store';
 import { ChatRequestBody } from '~/app/_components/chat';
+import { z } from 'zod';
+export const maxDuration = 30;
+
+
 
 
 export async function POST(req: Request) {
@@ -19,8 +23,33 @@ export async function POST(req: Request) {
   }
 
   const result = streamText({
+    toolCallStreaming: true,
     model: openai(model),
     messages,
+    tools: {
+      getWeatherInformation: {
+        description: 'Show the weather in a given city to the user',
+        parameters: z.object({city: z.string()}),
+        execute: async({}: { city: string }) => {
+          const weatherOptions = ['sunny', 'cloudy','rainy','snowy','windy'];
+          return weatherOptions[
+            Math.floor(Math.random() * weatherOptions.length)
+          ];
+        },
+      },
+      askForConfirmation: {
+        description: 'Ask the user for confirmation',
+        parameters: z.object({
+          message: z.string().describe('The message to ask for confirmation.'),
+        }),
+      },
+
+      getLocation: {
+        description:
+        'Get the user location.Always ask for confirmation before using this tool',
+        parameters: z.object({}),
+      },
+    },
     onError({error}) {
       console.error(error)
     },

@@ -9,6 +9,7 @@ import { Input } from "~/components/ui/input";
 import { PaperclipIcon, SendIcon } from "lucide-react";
 import { UIMessage } from 'ai';
 import { ModelId } from '../types/models';
+import { ToolInvocation } from 'ai';
 
 type ChatProps = {
   chatId: number;
@@ -23,11 +24,24 @@ export type ChatRequestBody = {
 
 export default function Chat({ chatId, initialMessages }: ChatProps) {
   const [selectedModel, setSelectedModel] = useState<ModelId>('gpt-4o-mini');
-  const { messages, input, handleSubmit, handleInputChange, status, error } = useChat({
+  const { messages, input, handleSubmit, handleInputChange, status, error, addToolResult } = useChat({
+    maxSteps: 5,
     id: chatId.toString(),
     initialMessages,
     body: {
       model: selectedModel,
+    },
+
+    async onToolCall({ toolCall}) {
+      if (toolCall.toolName === 'getLocation') {
+        const cities = [
+          'New York',
+          'Los Angeles',
+          'Chicago',
+          'San Franciso',
+        ];
+        return cities[Math.floor(Math.random() * cities.length)];
+      }
     },
     experimental_prepareRequestBody({ messages }) {
       return {
@@ -59,7 +73,103 @@ export default function Chat({ chatId, initialMessages }: ChatProps) {
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-3xl mx-auto py-4 px-4">
           {messages.map((message, index) => (
-            <ChatMessage key={`${message.id}-${index}`} message={message} />
+            <div key={index}>
+              {
+                message.parts.map(part => {
+                  switch (part.type) {
+                    case 'text':
+                      return <ChatMessage key={`${message.id}-${index}`} message={message} />
+
+                    case 'tool-invocation': {
+                      const callId = part.toolInvocation.toolCallId;
+
+                      switch (part.toolInvocation.toolName) {
+                        case 'askForConfirmation': {
+                          switch (part.toolInvocation.state) {
+                            case 'call':
+                              return (
+                                <div key={callId}>
+                                  {part.toolInvocation.args.message}
+                                  <div>
+                                    <button
+                                      onClick={() => 
+                                        addToolResult({
+                                          toolCallId: callId,
+                                          result: 'Yes, confirmed.',
+                                        })
+                                      }
+                                    >
+                                      Yes
+                                    </button>
+                                    <button
+                                      onClick={() =>
+                                        addToolResult({
+                                          toolCallId: callId,
+                                          result: 'No, denied',
+                                        })
+                                      }
+                                      >
+                                        No
+                                      </button>
+                                    </div>
+                                </div>
+                              );
+                            case 'result':
+                              return (
+                                <div key={callId}>
+                                  Location access allows:{' '}
+                                  {part.toolInvocation.result}
+                                </div>
+                              );
+                          }
+                          break;
+                        }
+                        case 'getLocation': {
+                          switch(part.toolInvocation.state) {
+                            case 'call':
+                              return <div key={callId}> Getting location...</div>
+                            case 'result':
+                              return (
+                                <div key={callId}>
+                                  Location: {part.toolInvocation.result}
+                                </div>
+                              );
+                          }
+                          break;
+                        }
+
+                        case 'getWeatherInformation': {
+                          switch (part.toolInvocation.state) {
+                            // example of pre-rendering streaming tool calls:
+                            case 'partial-call':
+                              return (
+                                <pre key={callId}>
+                                  {JSON.stringify(part.toolInvocation, null, 2)}
+                                </pre>
+                              );
+                            case 'call':
+                              return (
+                                <div key={callId}>
+                                  Getting weather information for{' '}
+                                  {part.toolInvocation.args.city}...
+                                </div>
+                              );
+                            case 'result':
+                              return (
+                                <div key={callId}>
+                                  Weather in {part.toolInvocation.args.city}:{' '}
+                                  {part.toolInvocation.result}
+                                </div>
+                              );
+                          }
+                          break;
+                        }
+                      }
+                    }
+                  }
+                })
+              }
+            </div>
           ))}
         </div>
       </div>
@@ -143,3 +253,5 @@ function ChatMessage({ message }: { message: Message }) {
     </div>
   );
 }
+
+
