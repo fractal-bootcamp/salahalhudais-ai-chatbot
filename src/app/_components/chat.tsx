@@ -1,8 +1,12 @@
 'use client';
-
 import { Message, useChat } from '@ai-sdk/react';
 import { useRef, useState } from 'react';
 import ModelSelector from './modelSelector';
+import { cn } from "~/lib/utils";
+import { CodeBlock } from "~/code-block";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { PaperclipIcon, SendIcon } from "lucide-react";
 
 type ChatProps = {
   chatId: number;
@@ -17,104 +21,117 @@ export default function Chat({ chatId, initialMessages }: ChatProps) {
     body: {
       model: selectedModel,
     },
+    experimental_prepareRequestBody({ messages }) {
+      return {
+        messages: [messages[messages.length -1]],
+        id: chatId,
+        model: selectedModel
+      }
+    },
   });
-  console.log(status, error)
+  // console.log(status, error)
 
   const [files, setFiles] = useState<FileList | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setFiles(event.target.files);
+    }
+  };
+
   return (
-    <div className="flex h-screen flex-col bg-white">
-      {/* Model Selector */}
-      <div className="border-b border-gray-200 p-4">
+    <div className="flex flex-col h-screen">
+      <div className="h-14 border-b flex items-center px-4">
         <ModelSelector 
           selectedModel={selectedModel} 
           onModelChange={setSelectedModel} 
         />
       </div>
-
-      {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message, index) => (
-          <div
-            key={`${message.id}-${index}`}
-            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'
-              }`}
-          >
-            <div
-              className={`max-w-[80%] rounded-lg px-4 py-2 ${message.role === 'user'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-800'
-                }`}
-            >
-              <div className="text-sm">{message.content}</div>
-
-              {/* Image Attachments */}
-              {message.experimental_attachments?.filter(attachment =>
-                attachment?.contentType?.startsWith('image/')
-              ).map((attachment, attachmentIndex) => (
-                <img
-                  key={`${message.id}-${index}-${attachmentIndex}`}
-                  src={attachment.url}
-                  alt={attachment.name}
-                  className="mt-2 rounded-md max-w-full"
-                />
-              ))}
-            </div>
-          </div>
-        ))}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-3xl mx-auto py-4 px-4">
+          {messages.map((message, index) => (
+            <ChatMessage key={`${message.id}-${index}`} message={message} />
+          ))}
+        </div>
       </div>
+      <div className="border-t bg-background">
+        <div className="max-w-3xl mx-auto">
+          <form onSubmit={handleSubmit}>
+            {}
+            {files && (
+              <div className="px-4 py-1 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <PaperclipIcon className="h-3 w-3" />
+                  <span>{files.length} files selected</span>
+                </div>
+              </div>
+            )}
+            <div className="flex items-center gap-2 p-4">
+              <Button 
+                type="button" 
+                variant="ghost" 
+                size="icon" 
+                className="shrink-0"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <PaperclipIcon className="h-5 w-5 text-muted-foreground" />
+              </Button>
+              
+              <Input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={handleFileChange}
+                multiple
+              />
+              
+              <Input
+                value={input}
+                onChange={handleInputChange}
+                placeholder="Send a message..."
+                disabled={status !== 'ready'}
+                className="min-h-[44px] border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none text-white bg-zinc-800/50 flex-grow"
+              />
+              
+              <Button 
+                type="submit" 
+                disabled={status !== 'ready'} 
+                size="icon"
+                className="shrink-0"
+              >
+                <SendIcon className="h-5 w-5" />
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-      {/* Input Form */}
-      <form
-        onSubmit={event => {
-          handleSubmit(event, {
-            experimental_attachments: files,
-          });
-          setFiles(undefined);
-          if (fileInputRef.current) {
-            fileInputRef.current.value = '';
+function ChatMessage({ message }: { message: Message }) {
+  const isUser = message.role === 'user';
+  const parts = message.content.split(/(```[\s\S]*?```)/);
+  
+  return (
+    <div className={cn(
+      "mb-4 flex",
+      isUser ? "justify-end" : "justify-start"
+    )}>
+      <div className={cn(
+        "max-w-[85%] rounded-lg px-4 py-2",
+        isUser ? "bg-primary text-primary-foreground" : "bg-muted"
+      )}>
+        {parts.map((part, i) => {
+          if (part.startsWith("```")) {
+            const [_, lang, ...code] = part.split("\n");
+            const codeContent = code.slice(0, -1).join("\n");
+            return <CodeBlock key={i} language={lang.replace("```", "")} code={codeContent} />;
           }
-        }}
-        className="border-t border-gray-100 p-4 space-y-4"
-      >
-        <div className="flex items-center space-x-4">
-          <input
-            type="file"
-            onChange={event => {
-              if (event.target.files) {
-                setFiles(event.target.files);
-              }
-            }}
-            multiple
-            ref={fileInputRef}
-            className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 
-                     file:rounded-full file:border-0 file:text-sm file:font-semibold
-                     file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-          />
-        </div>
-
-        <div className="flex space-x-4">
-          <input
-            value={input}
-            placeholder="Send a message..."
-            onChange={handleInputChange}
-            disabled={status !== 'ready'}
-            className="flex-1 min-w-0 rounded-lg border border-gray-200 px-4 py-2 text-sm
-                     focus:outline-none focus:border-blue-500 disabled:opacity-50
-                     disabled:cursor-not-allowed"
-          />
-          <button
-            type="submit"
-            disabled={status !== 'ready'}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium
-                     hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed
-                     transition-colors"
-          >
-            Send
-          </button>
-        </div>
-      </form>
+          return <p key={i} className="text-sm whitespace-pre-wrap">{part}</p>;
+        })}
+      </div>
     </div>
   );
 }

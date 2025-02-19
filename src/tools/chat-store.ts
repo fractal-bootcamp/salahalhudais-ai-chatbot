@@ -18,35 +18,28 @@ export async function saveChat({
   sessionId,
   messages,
 }: SaveChatParams): Promise<void> {
-  console.log("Saving Messages", sessionId, messages);
-
-  // Insert all messages
-  if (messages.length > 0) {
-    await db.insert(dbMessages).values(
-      messages.map((msg) => ({
-        sessionId,
-        message: msg.content,
-        role: msg.role as "user" | "assistant",
-      }))
-    ).onConflictDoNothing();
-
-    // If this is the first user message, generate and update the title
-    if (messages.length === 1 && messages[0]?.role === 'user') {
-      const title = await generateSessionTitle(messages[0].content);
-      await updateSessionTitle(sessionId, title);
-    }
+  // Get just the last message
+  const lastMessage = messages[messages.length - 1];
+  
+  // Insert only the last message
+  if (lastMessage) {
+    await db.insert(dbMessages).values({
+      sessionId,
+      message: lastMessage.content,
+      role: lastMessage.role as "user" | "assistant",
+    });
   }
 }
 
 export async function loadChat(id: number): Promise<Message[]> {
-  console.log("loading chat! ", id)
+  // console.log("loading chat! ", id)
   const result = await db
     .select()
     .from(dbMessages)
     .where(eq(dbMessages.sessionId, id))
     .orderBy(dbMessages.createdAt);
 
-    console.log("got chats: ", result)
+    // console.log("got chats: ", result)
 
   return result.map((msg) => ({
     id: msg.id.toString(),
@@ -56,9 +49,9 @@ export async function loadChat(id: number): Promise<Message[]> {
 }
 
 export async function createChat(): Promise<number | undefined> {
-  console.log("creating chat")
+  // console.log("creating chat")
   const result = await db.insert(sessions).values({}).returning({sessionId: sessions.id})
-  console.log(result)
+  // console.log(result)
   return result[0]?.sessionId
 }
 
@@ -88,7 +81,7 @@ export async function getSessionsInfo(): Promise<SessionInfo[]> {
 }
 
 // todo: retreive titles
-async function generateSessionTitle(message: string): Promise<string> {
+export async function generateSessionTitle(message: string): Promise<string> {
   // This code is generative and has a dangerous side effect with a high failure rate
   // so probably you can't trust it to work on the first try.
  const result = await generateText({
@@ -106,7 +99,7 @@ async function generateSessionTitle(message: string): Promise<string> {
       maxTokens: 20,
       temperature: 0.7,
     }) ?? "New Chat";
-
+  // console.log("This is the generated title:", result);
   return result.text;
 }
 

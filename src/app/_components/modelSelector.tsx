@@ -1,5 +1,13 @@
 'use client';
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectGroup,
+} from "~/components/ui/select";
 import { MODEL_OPTIONS } from '../types/models';
 
 interface ModelSelectorProps {
@@ -9,16 +17,19 @@ interface ModelSelectorProps {
 
 export default function ModelSelector({ selectedModel, onModelChange }: ModelSelectorProps) {
   return (
-    <select
-      value={selectedModel}
-      onChange={(e) => onModelChange(e.target.value)}
-      className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-    >
-      {MODEL_OPTIONS.map((model) => (
-        <option key={model.id} value={model.id}>
-          {model.name}
-        </option>
-      ))}
-    </select>
+    <Select value={selectedModel} onValueChange={onModelChange}>
+      <SelectTrigger className="w-[200px] h-8">
+        <SelectValue placeholder="Select a model" />
+      </SelectTrigger>
+      <SelectContent className="w-[200px]">
+        <SelectGroup>
+          {MODEL_OPTIONS.map((model) => (
+            <SelectItem key={model.id} value={model.id}>
+              {model.name}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   );
 }
