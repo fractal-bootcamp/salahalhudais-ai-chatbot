@@ -18,29 +18,25 @@ export async function saveChat({
   sessionId,
   messages,
 }: SaveChatParams): Promise<void> {
-  // Get just the last message
-  const lastMessage = messages[messages.length - 1];
-  
-  // Insert only the last message
-  if (lastMessage) {
-    await db.insert(dbMessages).values({
+  const messagesToSave = messages.map((msg) => {
+    return {
+      id: msg.id,
       sessionId,
-      message: lastMessage.content,
-      role: lastMessage.role as "user" | "assistant",
-    });
-  }
+      message: msg.content,
+      role: msg.role as "user" | "assistant",
+    }
+  })
+
+  // this needs to be tested
+  await db.insert(dbMessages).values(messagesToSave).onConflictDoNothing();
 }
 
 export async function loadChat(id: number): Promise<Message[]> {
-  // console.log("loading chat! ", id)
   const result = await db
     .select()
     .from(dbMessages)
     .where(eq(dbMessages.sessionId, id))
     .orderBy(dbMessages.createdAt);
-
-    // console.log("got chats: ", result)
-
   return result.map((msg) => ({
     id: msg.id.toString(),
     content: msg.message,

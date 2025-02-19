@@ -8,11 +8,11 @@ import {
   SelectValue,
   SelectGroup,
 } from "~/components/ui/select";
-import { MODEL_OPTIONS } from '../types/models';
+import { MODEL_OPTIONS, ModelId } from '../types/models';
 
 interface ModelSelectorProps {
-  selectedModel: string;
-  onModelChange: (modelId: string) => void;
+  selectedModel: ModelId;
+  onModelChange: (modelId: ModelId) => void;
 }
 
 export default function ModelSelector({ selectedModel, onModelChange }: ModelSelectorProps) {

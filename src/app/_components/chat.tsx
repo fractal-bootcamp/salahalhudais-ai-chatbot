@@ -7,14 +7,22 @@ import { CodeBlock } from "~/code-block";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { PaperclipIcon, SendIcon } from "lucide-react";
+import { UIMessage } from 'ai';
+import { ModelId } from '../types/models';
 
 type ChatProps = {
   chatId: number;
   initialMessages: Message[];
 };
 
+export type ChatRequestBody = {
+  messages: UIMessage[],
+  id: number,
+  model: ModelId
+}
+
 export default function Chat({ chatId, initialMessages }: ChatProps) {
-  const [selectedModel, setSelectedModel] = useState('gpt-4o-mini');
+  const [selectedModel, setSelectedModel] = useState<ModelId>('gpt-4o-mini');
   const { messages, input, handleSubmit, handleInputChange, status, error } = useChat({
     id: chatId.toString(),
     initialMessages,
@@ -23,7 +31,7 @@ export default function Chat({ chatId, initialMessages }: ChatProps) {
     },
     experimental_prepareRequestBody({ messages }) {
       return {
-        messages: [messages[messages.length -1]],
+        messages,
         id: chatId,
         model: selectedModel
       }
@@ -91,7 +99,7 @@ export default function Chat({ chatId, initialMessages }: ChatProps) {
                 onChange={handleInputChange}
                 placeholder="Send a message..."
                 disabled={status !== 'ready'}
-                className="min-h-[44px] border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none text-white bg-zinc-800/50 flex-grow"
+                className="min-h-[44px] border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none text-[#09090b] placeholder:text-[#09090b] bg-[#f4f4f5] flex-grow"
               />
               
               <Button 
@@ -127,7 +135,7 @@ function ChatMessage({ message }: { message: Message }) {
           if (part.startsWith("```")) {
             const [_, lang, ...code] = part.split("\n");
             const codeContent = code.slice(0, -1).join("\n");
-            return <CodeBlock key={i} language={lang.replace("```", "")} code={codeContent} />;
+            return <CodeBlock key={i} language={lang?.replace("```", "") || "markdown"} code={codeContent} />;
           }
           return <p key={i} className="text-sm whitespace-pre-wrap">{part}</p>;
         })}

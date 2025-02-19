@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "2b9a348c-2eb2-4405-a079-1e817b1ed08f",
+  "id": "f80ecbba-4a6e-4a15-83c3-06bd4a8288da",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "chatbotrerun_message": {
@@ -9,10 +9,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "text",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": true
+          "autoincrement": false
         },
         "session_id": {
           "name": "session_id",

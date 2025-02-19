@@ -9,6 +9,7 @@ interface CodeBlockProps {
   code: string;
 }
 
+// Do Not Do A Plagiarism, just tell me where you got the code from pls:
 export function CodeBlock({ language, code }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
 

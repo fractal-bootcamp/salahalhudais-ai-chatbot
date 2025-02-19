@@ -3,33 +3,37 @@ import { openai } from '@ai-sdk/openai';
 import { appendClientMessage, appendResponseMessages, streamText } from 'ai';
 import { saveChat, generateSessionTitle, updateSessionTitle } from '~/tools/chat-store';
 import { loadChat } from '~/tools/chat-store';
+import { ChatRequestBody } from '~/app/_components/chat';
+
 
 export async function POST(req: Request) {
-  const { messages, id, model } = await req.json();
-  const previousMessages = await loadChat(id);
-  const fullMessages = [...previousMessages, ...messages];
+  const { messages, id, model }: ChatRequestBody = await req.json();
+  const firstMessage = messages[0]
 
   // If this is the first message, generate a title after the response
-  if (previousMessages.length === 0 && messages.length === 1 && messages[0]?.role === 'user') {
+  if (firstMessage && messages[0]?.role === 'user') {
     after(async () => {
-      const title = await generateSessionTitle(messages[0].content);
+      const title = await generateSessionTitle(firstMessage.content);
       await updateSessionTitle(id, title);
     });
   }
 
   const result = streamText({
     model: openai(model),
-    messages: fullMessages,
+    messages,
     onError({error}) {
       console.error(error)
     },
-    async onFinish({ response }) {
+    async onFinish({ response, text}) {
+      console.log(response)
+      response.messages
+      // Save only the AI's response message
       await saveChat({
         sessionId: id,
         messages: appendResponseMessages({
-          messages: fullMessages,
-          responseMessages: response.messages,
-        }),
+          messages,
+          responseMessages: response.messages
+        })
       });
     },
   });

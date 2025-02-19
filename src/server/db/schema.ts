@@ -3,6 +3,7 @@
 
 import { sql } from "drizzle-orm";
 import { index, int, integer, sqliteTableCreator, text } from "drizzle-orm/sqlite-core";
+import { createId } from '@paralleldrive/cuid2';
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -26,7 +27,7 @@ export const sessions = createTable(
 export const messages = createTable(
   "message",
   {
-    id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+    id: text("id").primaryKey().$defaultFn(() => createId()),
     sessionId: integer("session_id").references(() => sessions.id),
     createdAt: int("created_at", { mode: "timestamp" })
       .default(sql`(unixepoch())`)

@@ -10,6 +10,8 @@ export interface ModelOption {
   supportsToolStreaming: boolean;
 }
 
+export type ModelId = 'gpt-4o' | 'gpt-4o-mini' | 'gpt-4-turbo' | 'gpt-4' | 'o3-mini' | 'o1';
+
 export const MODEL_OPTIONS: ModelOption[] = [
   {
     provider: 'OpenAI',
