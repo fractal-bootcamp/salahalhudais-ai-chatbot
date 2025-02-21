@@ -7,12 +7,13 @@ export async function DELETE(req: Request,
   {params}: {params: {id: string}}
 ) {
   try {
-    const id = Number(params.id);
-    await db.delete(messages).where(eq(messages.sessionId, id));
-    await db.delete(sessions).where(eq(sessions.id, id));
-    return NextResponse.json({ success: true});
+    const { id } = await params;
+    const sessionId = Number(id);
+    await db.delete(messages).where(eq(messages.sessionId, sessionId));
+    await db.delete(sessions).where(eq(sessions.id, sessionId));
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting session:', error);
-    return NextResponse.json({erorr: 'Failure'});
+    return NextResponse.json({ error: 'Failure' }, { status: 500 });
   }
 }
