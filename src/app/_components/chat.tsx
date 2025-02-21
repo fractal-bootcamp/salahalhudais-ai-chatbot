@@ -140,7 +140,6 @@ export default function Chat({ chatId, initialMessages }: ChatProps) {
 
                         case 'getWeatherInformation': {
                           switch (part.toolInvocation.state) {
-                            // example of pre-rendering streaming tool calls:
                             case 'partial-call':
                               return (
                                 <pre key={callId}>
@@ -149,16 +148,34 @@ export default function Chat({ chatId, initialMessages }: ChatProps) {
                               );
                             case 'call':
                               return (
-                                <div key={callId}>
-                                  Getting weather information for{' '}
-                                  {part.toolInvocation.args.city}...
+                                <div key={callId} className="flex items-center gap-2 text-muted-foreground">
+                                  <div className="animate-spin">⌛</div>
+                                  <span>Fetching weather data for {part.toolInvocation.args.city}...</span>
                                 </div>
                               );
                             case 'result':
                               return (
-                                <div key={callId}>
-                                  Weather in {part.toolInvocation.args.city}:{' '}
-                                  {part.toolInvocation.result}
+                                <div key={callId} className="rounded-lg border bg-card p-4 shadow-sm">
+                                  <div className="flex items-center gap-2 font-medium text-foreground">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="20"
+                                      height="20"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      className="text-blue-500"
+                                    >
+                                      <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
+                                    </svg>
+                                    <span>Weather Report for {part.toolInvocation.args.city}</span>
+                                  </div>
+                                  <div className="mt-2 whitespace-pre-wrap text-sm text-muted-foreground">
+                                    {part.toolInvocation.result}
+                                  </div>
                                 </div>
                               );
                           }
