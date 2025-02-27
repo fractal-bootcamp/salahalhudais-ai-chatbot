@@ -4,51 +4,66 @@ import { writeFile } from 'fs/promises';
 import path from 'path';
 import { Message } from 'ai';
 import { readFile } from 'fs/promises';
+import { db } from '~/server/db';
+import { sessions, messages as dbMessages } from "~/server/db/schema";
+import { eq } from "drizzle-orm";
 
-// In-memory storage for chats
-export const chats: { id: string; messages: Message[] }[] = [];
+type SaveChatParams = {
+  sessionId: number;
+  messages: Message[];
+}
 
 export async function saveChat({
-  id,
+  sessionId,
   messages,
-}: {
-  id: string;
-  messages: Message[];
-}): Promise<void> {
-  const chatIndex = chats.findIndex(chat => chat.id === id);
-  if (chatIndex !== -1) {
-    const chat = chats[chatIndex];
-    if (chat) {
-      chat.messages = messages;
-    }
-  } else {
-    chats.push({ id, messages });
+}: SaveChatParams): Promise<void> {
+  console.log("Saving Messages", sessionId, messages)
+
+  // Insert all messages
+  if (messages.length > 0) {
+    await db.insert(dbMessages).values(
+      messages.map((msg) => ({
+        sessionId,
+        message: msg.content,
+        role: msg.role as "user" | "assistant",
+      }))
+    ).onConflictDoNothing();
   }
-
-  const content = JSON.stringify(messages, null, 2);
-  await writeFile(getChatFile(id), content);
 }
 
-export async function loadChat(id: string): Promise<Message[]> {
-  const chat = chats.find(chat => chat.id === id);
-  if (chat) {
-    return chat.messages;
+export async function loadChat(id: number): Promise<Message[]> {
+  console.log("loading chat! ", id)
+  const result = await db
+    .select()
+    .from(dbMessages)
+    .where(eq(dbMessages.sessionId, id))
+    .orderBy(dbMessages.createdAt);
+
+    console.log("got chats: ", result)
+
+  return result.map((msg) => ({
+    id: msg.id.toString(),
+    content: msg.message,
+    role: msg.role,
+  }));
+}
+
+export async function createChat(): Promise<number | undefined> {
+  console.log("creating chat")
+  const result = await db.insert(sessions).values({}).returning({sessionId: sessions.id})
+  console.log(result)
+  return result[0]?.sessionId
+}
+
+export async function getSessionIds(): Promise<number[]> {
+  try {
+    const allSessions = await db.select({id: sessions.id})
+    .from(sessions)
+    .orderBy(sessions.createdAt);
+    
+    return allSessions.map(session => session.id);
+  } catch (error) {
+    console.error('Error fetching session IDs:', error);
+    return [];
   }
-  return JSON.parse(await readFile(getChatFile(id), 'utf8'));
-}
-
-export async function createChat(): Promise<string> {
-  const id = generateId(); // generate a unique chat ID
-  await writeFile(getChatFile(id), '[]'); // create an empty chat file
-  return id;
-}
-
-function getChatFile(id: string): string {
-  const chatDir = path.join(process.cwd(), '.chats');
-  if (!existsSync(chatDir)) mkdirSync(chatDir, { recursive: true });
-  return path.join(chatDir, `${id}.json`);
-}
-
-export function getSessionIds() {
-  return chats.map(chat => chat.id)
 }

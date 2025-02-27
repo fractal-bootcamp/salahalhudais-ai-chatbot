@@ -8,9 +8,12 @@ export async function POST(req: Request) {
   const result = streamText({
     model: openai('gpt-4o-mini'),
     messages,
+    onError({error}) {
+      console.error(error)
+    },
     async onFinish({ response }) {
       await saveChat({
-        id,
+        sessionId: id,
         messages: appendResponseMessages({
           messages,
           responseMessages: response.messages,
