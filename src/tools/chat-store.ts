@@ -25,6 +25,7 @@ export async function saveChat({
       messages.map((msg) => ({
         sessionId,
         message: msg.content,
+        role: msg.role as "user" | "assistant",
       }))
     ).onConflictDoNothing();
   }
@@ -43,7 +44,7 @@ export async function loadChat(id: number): Promise<Message[]> {
   return result.map((msg) => ({
     id: msg.id.toString(),
     content: msg.message,
-    role: 'user', // You might want to add a role column
+    role: msg.role,
   }));
 }
 

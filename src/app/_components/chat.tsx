@@ -19,7 +19,7 @@ export default function Chat({ chatId, initialMessages }: ChatProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-12rem)] bg-white rounded-lg shadow-sm border border-gray-100">
+    <div className="flex h-screen flex-col bg-white">
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message, index) => (
