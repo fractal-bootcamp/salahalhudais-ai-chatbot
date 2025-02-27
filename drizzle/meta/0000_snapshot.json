@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "e15c0e31-b527-4567-bb14-bae66b2e193c",
+  "id": "f80ecbba-4a6e-4a15-83c3-06bd4a8288da",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "chatbotrerun_message": {
@@ -9,10 +9,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "text",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": true
+          "autoincrement": false
         },
         "session_id": {
           "name": "session_id",
@@ -79,6 +79,14 @@
           "primaryKey": true,
           "notNull": true,
           "autoincrement": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'New Chat'"
         },
         "created_at": {
           "name": "created_at",
